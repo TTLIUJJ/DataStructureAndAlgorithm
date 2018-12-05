@@ -1,5 +1,12 @@
 # 删除排序链表中重复出现的节点（LeetCode 83）
 
+```
+// 1->2->2->3->3-3->4->4->5
+// 1->2->3->4->5
+```
+
+保留重复节点的首节点
+
 
 ```java
 public class RemoveRepeatSortListNodes {

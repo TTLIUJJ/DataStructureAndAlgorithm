@@ -101,15 +101,25 @@ T(n) = T(n/5) + T(n/7) + O(n)
 public class BFPRT {
     public static void bfprt(int[]a, int k) {
         select(a, 0, a.length - 1, k-1);
+        int []res = Arrays.copyOf(a, k);
+        System.out.println(Arrays.toString(res));
         System.out.println(Arrays.toString(a));
     }
 
+    /**
+     *  在数组a找到最小的前i个数
+     */
     public static int select(int []a, int lo, int hi, int i) {
         if (lo == hi) {
-            return a[lo];
+            return a[i];
         }
         int pivotValue   = medianOfMedians(a, lo, hi);
         int []pivotRange = partition(a, lo, hi, pivotValue);
+
+        /*
+         * 经过上面处理过后, [lo...lt, equal_lo ... equal_hi, gt ...hi] 
+         * 如果i位于[equal_lo...equal_hi]里, 那么[lo...i]是数组的最小的i个数
+         */
         if (i <= pivotRange[1] && i >= pivotRange[0]) {
             return a[i];
         }
@@ -121,6 +131,13 @@ public class BFPRT {
         }
     }
 
+    /**
+     *  在每5个连续的元素组成的小数组中
+     *  挑出小数组的中位数
+     *  然后组成新的数组
+     *
+     * @return 新数组的中位数
+     */
     public static int medianOfMedians(int []a, int lo, int hi) {
         int counts = hi - lo + 1;
         int offset = counts % 5 == 0 ? 0 : 1;
@@ -131,12 +148,19 @@ public class BFPRT {
         for (int i = 0; i < medianArray.length; ++i) {
             loI = lo + i * 5;
             hiI = loI + 4;
-            medianArray[i] = getMedian(a, loI, Math.min(hiI, hi));
+            medianArray[i] = getMedian(a, loI, Math.min(hi, hiI));
         }
 
         return select(medianArray, 0, medianArray.length - 1, medianArray.length / 2);
     }
 
+    /**
+     *  在荷兰国旗算法中 pivotValue是随机选取的
+     *  在bfprt算法中  pivotValue至少可以过滤掉10n/3的数据
+     *
+     *  @return lt+1 数组中等于pivotValue的左边界
+     *          gt-1 数组中等于pivotValue的右边界
+     */
     public static int []partition(int []a, int lo, int hi, int pivotValue) {
         int lt = lo - 1;
         int  i = lo;
@@ -144,7 +168,7 @@ public class BFPRT {
 
         while (i < gt) {
             if (a[i] == pivotValue) {
-                i++;
+                ++i;
             }
             else if (a[i] < pivotValue) {
                 swap(a, i++, ++lt);
@@ -157,23 +181,24 @@ public class BFPRT {
         return new int[] { lt+1, gt-1 };
     }
 
+    /**
+     * 在5个元素组成的数组中 找到其下中位数
+     */
     public static int getMedian(int []a, int lo, int hi) {
         insertionSort(a, lo, hi);
-
         int sum = lo + hi;
         int mid = (sum / 2) + (sum % 2);
         return a[mid];
     }
 
     public static void insertionSort(int []a, int lo, int hi) {
-
         for (int i = lo + 1; i <= hi; ++i) {
             for (int j = i; j > lo; --j) {
                 if (a[j-1] < a[j]) {
                     break;
                 }
                 else {
-                    swap(a, j-1, j);
+                    swap(a, i, j);
                 }
             }
         }
@@ -185,9 +210,11 @@ public class BFPRT {
         a[j] = t;
     }
 
+
+
     public static void main(String []args) {
         int []a = new int[] {
-                5, 1, 9, 4, 3, 8, 7, 2, 6, 3, 1, 2
+                5, 1, 9, 4, 10, 3, 8, 8, 7, 2, 6, 5, 1, 2
         };
         bfprt(a, 8);
     }
